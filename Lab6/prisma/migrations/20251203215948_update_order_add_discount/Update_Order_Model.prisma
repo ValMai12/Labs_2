@@ -1,0 +1,22 @@
+model Order {
+  order_id            Int            @id @default(autoincrement())
+  user_id             Int
+  address_id          Int?
+  cart_id             Int?
+  total_amount        Decimal        @db.Decimal(10, 2)
+  status              order_statuses @default(pending)
+  created_at          DateTime       @default(now())
+  shipped_at          DateTime?
+  delivered_at        DateTime?
+  applied_discount_id Int?
+  
+  user              User          @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
+  address           Address?      @relation(fields: [address_id], references: [address_id], onDelete: SetNull)
+  cart              Cart?         @relation(fields: [cart_id], references: [cart_id], onDelete: SetNull)
+  applied_discount  DiscountRule? @relation(fields: [applied_discount_id], references: [discount_rule_id], onDelete: SetNull)
+  payments          Payment[]
+  delivery          Delivery?
+
+  @@map("Order")
+}
+

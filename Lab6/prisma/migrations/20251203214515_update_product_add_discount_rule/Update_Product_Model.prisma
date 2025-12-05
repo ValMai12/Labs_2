@@ -1,0 +1,20 @@
+model Product {
+  product_id       Int              @id @default(autoincrement())
+  category_id      Int?
+  name             String           @db.VarChar(100)
+  description      String?          @db.VarChar(500)
+  price            Decimal          @db.Decimal(10, 2)
+  stock            Int              @default(0)
+  status           product_statuses @default(active)
+  image_url        String?          @db.VarChar(255)
+  created_at       DateTime         @default(now())
+  updated_at       DateTime         @default(now())
+  discount_rule_id Int?
+  
+  category      Category?      @relation(fields: [category_id], references: [category_id], onDelete: SetNull)
+  discount_rule DiscountRule?  @relation(fields: [discount_rule_id], references: [discount_rule_id], onDelete: SetNull)
+  cart_items    CartItem[]
+  reviews       Review[]
+  wishlists     Wishlist[]
+}
+

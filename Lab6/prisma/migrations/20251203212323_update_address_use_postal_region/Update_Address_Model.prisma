@@ -1,0 +1,12 @@
+model Address {
+  address_id  Int     @id @default(autoincrement())
+  user_id     Int
+  street      String  @db.VarChar(100)
+  postal_code String  @db.VarChar(20)
+  is_default  Boolean @default(false)
+  
+  user          User         @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
+  postal_region PostalRegion @relation(fields: [postal_code], references: [postal_code], onDelete: Restrict)
+  orders        Order[]
+}
+

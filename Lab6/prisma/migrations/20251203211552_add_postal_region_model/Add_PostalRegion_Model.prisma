@@ -1,0 +1,8 @@
+model PostalRegion {
+  postal_code String @id @db.VarChar(20)
+  city        String @db.VarChar(50)
+  country     String @db.VarChar(50)
+  
+  addresses Address[]
+}
+

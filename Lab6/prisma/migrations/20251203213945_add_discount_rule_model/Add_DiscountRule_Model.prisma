@@ -1,0 +1,18 @@
+enum discount_types {
+  percent
+  fixed
+}
+
+model DiscountRule {
+  discount_rule_id Int            @id @default(autoincrement())
+  code             String         @unique @db.VarChar(50)
+  type             discount_types
+  value            Decimal        @db.Decimal(10, 2)
+  valid_from       DateTime
+  valid_to         DateTime
+  is_active        Boolean        @default(true)
+  
+  products Product[]
+  orders   Order[]
+}
+
