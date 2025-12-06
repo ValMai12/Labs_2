@@ -18,7 +18,6 @@ lerna-debug.log*
 # Generated Prisma Client (usually in node_modules/.prisma)
 # Keep migrations in version control, but ignore generated client
 /generated/prisma
-prisma/migrations/.migrate
 *.db
 *.db-journal
 
