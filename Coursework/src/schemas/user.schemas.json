@@ -1,0 +1,109 @@
+{
+  "createUser": {
+    "type": "object",
+    "required": ["first_name", "last_name", "email", "password_hash"],
+    "properties": {
+      "first_name": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 50
+      },
+      "last_name": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 50
+      },
+      "email": {
+        "type": "string",
+        "format": "email",
+        "maxLength": 100
+      },
+      "password_hash": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 255
+      },
+      "phone": {
+        "type": "string",
+        "maxLength": 20
+      },
+      "role": {
+        "type": "string",
+        "enum": ["customer", "admin", "manager", "support"]
+      },
+      "is_active": {
+        "type": "boolean"
+      }
+    }
+  },
+  "updateUser": {
+    "type": "object",
+    "properties": {
+      "first_name": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 50
+      },
+      "last_name": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 50
+      },
+      "email": {
+        "type": "string",
+        "format": "email",
+        "maxLength": 100
+      },
+      "password_hash": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 255
+      },
+      "phone": {
+        "type": "string",
+        "maxLength": 20
+      },
+      "role": {
+        "type": "string",
+        "enum": ["customer", "admin", "manager", "support"]
+      },
+      "is_active": {
+        "type": "boolean"
+      }
+    }
+  },
+  "getUserParams": {
+    "type": "object",
+    "required": ["id"],
+    "properties": {
+      "id": {
+        "type": "string",
+        "pattern": "^[0-9]+$"
+      }
+    }
+  },
+  "deleteUserParams": {
+    "type": "object",
+    "required": ["id"],
+    "properties": {
+      "id": {
+        "type": "string",
+        "pattern": "^[0-9]+$"
+      }
+    }
+  },
+  "getUsersQuery": {
+    "type": "object",
+    "properties": {
+      "role": {
+        "type": "string",
+        "enum": ["customer", "admin", "manager", "support"]
+      },
+      "is_active": {
+        "type": "string",
+        "enum": ["true", "false"]
+      }
+    }
+  }
+}
+
