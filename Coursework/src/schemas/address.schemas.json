@@ -1,0 +1,76 @@
+{
+  "createAddress": {
+    "type": "object",
+    "required": ["user_id", "street", "postal_code"],
+    "properties": {
+      "user_id": {
+        "type": "integer"
+      },
+      "street": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 100
+      },
+      "postal_code": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 20
+      },
+      "is_default": {
+        "type": "boolean"
+      }
+    }
+  },
+  "updateAddress": {
+    "type": "object",
+    "properties": {
+      "street": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 100
+      },
+      "postal_code": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 20
+      },
+      "is_default": {
+        "type": "boolean"
+      }
+    }
+  },
+  "getAddressParams": {
+    "type": "object",
+    "required": ["id"],
+    "properties": {
+      "id": {
+        "type": "string",
+        "pattern": "^[0-9]+$"
+      }
+    }
+  },
+  "deleteAddressParams": {
+    "type": "object",
+    "required": ["id"],
+    "properties": {
+      "id": {
+        "type": "string",
+        "pattern": "^[0-9]+$"
+      }
+    }
+  },
+  "getAddressesQuery": {
+    "type": "object",
+    "properties": {
+      "user_id": {
+        "type": "string",
+        "pattern": "^[0-9]+$"
+      },
+      "is_default": {
+        "type": "string",
+        "enum": ["true", "false"]
+      }
+    }
+  }
+}
+
