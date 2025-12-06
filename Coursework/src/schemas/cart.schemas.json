@@ -1,0 +1,56 @@
+{
+  "createCart": {
+    "type": "object",
+    "required": ["user_id"],
+    "properties": {
+      "user_id": {
+        "type": "integer"
+      },
+      "is_active": {
+        "type": "boolean"
+      }
+    }
+  },
+  "updateCart": {
+    "type": "object",
+    "properties": {
+      "is_active": {
+        "type": "boolean"
+      }
+    }
+  },
+  "getCartParams": {
+    "type": "object",
+    "required": ["id"],
+    "properties": {
+      "id": {
+        "type": "string",
+        "pattern": "^[0-9]+$"
+      }
+    }
+  },
+  "deleteCartParams": {
+    "type": "object",
+    "required": ["id"],
+    "properties": {
+      "id": {
+        "type": "string",
+        "pattern": "^[0-9]+$"
+      }
+    }
+  },
+  "getCartsQuery": {
+    "type": "object",
+    "properties": {
+      "user_id": {
+        "type": "string",
+        "pattern": "^[0-9]+$"
+      },
+      "is_active": {
+        "type": "string",
+        "enum": ["true", "false"]
+      }
+    }
+  }
+}
+
