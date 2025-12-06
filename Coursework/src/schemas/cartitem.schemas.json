@@ -1,0 +1,61 @@
+{
+  "createCartItem": {
+    "type": "object",
+    "required": ["cart_id", "product_id", "quantity"],
+    "properties": {
+      "cart_id": {
+        "type": "integer"
+      },
+      "product_id": {
+        "type": "integer"
+      },
+      "quantity": {
+        "type": "integer",
+        "minimum": 1
+      }
+    }
+  },
+  "updateCartItem": {
+    "type": "object",
+    "properties": {
+      "quantity": {
+        "type": "integer",
+        "minimum": 1
+      }
+    }
+  },
+  "getCartItemParams": {
+    "type": "object",
+    "required": ["id"],
+    "properties": {
+      "id": {
+        "type": "string",
+        "pattern": "^[0-9]+$"
+      }
+    }
+  },
+  "deleteCartItemParams": {
+    "type": "object",
+    "required": ["id"],
+    "properties": {
+      "id": {
+        "type": "string",
+        "pattern": "^[0-9]+$"
+      }
+    }
+  },
+  "getCartItemsQuery": {
+    "type": "object",
+    "properties": {
+      "cart_id": {
+        "type": "string",
+        "pattern": "^[0-9]+$"
+      },
+      "product_id": {
+        "type": "string",
+        "pattern": "^[0-9]+$"
+      }
+    }
+  }
+}
+
