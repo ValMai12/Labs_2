@@ -1,0 +1,105 @@
+{
+  "createProduct": {
+    "type": "object",
+    "required": ["name", "price"],
+    "properties": {
+      "category_id": {
+        "type": "integer"
+      },
+      "name": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 100
+      },
+      "description": {
+        "type": "string",
+        "maxLength": 500
+      },
+      "price": {
+        "type": "number"
+      },
+      "stock": {
+        "type": "integer"
+      },
+      "status": {
+        "type": "string",
+        "enum": ["active", "hidden", "out_of_stock"]
+      },
+      "image_url": {
+        "type": "string",
+        "maxLength": 255
+      },
+      "discount_rule_id": {
+        "type": "integer"
+      }
+    }
+  },
+  "updateProduct": {
+    "type": "object",
+    "properties": {
+      "category_id": {
+        "type": "integer"
+      },
+      "name": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 100
+      },
+      "description": {
+        "type": "string",
+        "maxLength": 500
+      },
+      "price": {
+        "type": "number"
+      },
+      "stock": {
+        "type": "integer"
+      },
+      "status": {
+        "type": "string",
+        "enum": ["active", "hidden", "out_of_stock"]
+      },
+      "image_url": {
+        "type": "string",
+        "maxLength": 255
+      },
+      "discount_rule_id": {
+        "type": "integer"
+      }
+    }
+  },
+  "getProductParams": {
+    "type": "object",
+    "required": ["id"],
+    "properties": {
+      "id": {
+        "type": "string",
+        "pattern": "^[0-9]+$"
+      }
+    }
+  },
+  "deleteProductParams": {
+    "type": "object",
+    "required": ["id"],
+    "properties": {
+      "id": {
+        "type": "string",
+        "pattern": "^[0-9]+$"
+      }
+    }
+  },
+  "getProductsQuery": {
+    "type": "object",
+    "properties": {
+      "category_id": {
+        "type": "string",
+        "pattern": "^[0-9]+$"
+      },
+      "status": {
+        "type": "string",
+        "enum": ["active", "hidden", "out_of_stock"]
+      }
+    }
+  }
+}
+

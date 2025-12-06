@@ -1,6 +1,7 @@
 const Fastify = require("fastify");
 const { userRoutes } = require("./routes/user.routes");
 const { orderRoutes } = require("./routes/order.routes");
+const { productRoutes } = require("./routes/product.routes");
 
 const fastify = Fastify({
   logger: true,
@@ -8,6 +9,7 @@ const fastify = Fastify({
 
 fastify.register(userRoutes);
 fastify.register(orderRoutes);
+fastify.register(productRoutes);
 
 fastify.get("/", async (request, reply) => {
   return "Maievska Valeria IM41";
