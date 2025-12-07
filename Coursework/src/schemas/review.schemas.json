@@ -1,0 +1,81 @@
+{
+  "createReview": {
+    "type": "object",
+    "required": ["user_id", "product_id"],
+    "properties": {
+      "user_id": {
+        "type": "integer"
+      },
+      "product_id": {
+        "type": "integer"
+      },
+      "rating": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 5
+      },
+      "comment": {
+        "type": "string",
+        "maxLength": 500
+      },
+      "is_approved": {
+        "type": "boolean"
+      }
+    }
+  },
+  "updateReview": {
+    "type": "object",
+    "properties": {
+      "rating": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 5
+      },
+      "comment": {
+        "type": "string",
+        "maxLength": 500
+      },
+      "is_approved": {
+        "type": "boolean"
+      }
+    }
+  },
+  "getReviewParams": {
+    "type": "object",
+    "required": ["id"],
+    "properties": {
+      "id": {
+        "type": "string",
+        "pattern": "^[0-9]+$"
+      }
+    }
+  },
+  "deleteReviewParams": {
+    "type": "object",
+    "required": ["id"],
+    "properties": {
+      "id": {
+        "type": "string",
+        "pattern": "^[0-9]+$"
+      }
+    }
+  },
+  "getReviewsQuery": {
+    "type": "object",
+    "properties": {
+      "user_id": {
+        "type": "string",
+        "pattern": "^[0-9]+$"
+      },
+      "product_id": {
+        "type": "string",
+        "pattern": "^[0-9]+$"
+      },
+      "is_approved": {
+        "type": "string",
+        "enum": ["true", "false"]
+      }
+    }
+  }
+}
+
