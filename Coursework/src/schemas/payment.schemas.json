@@ -1,0 +1,84 @@
+{
+  "createPayment": {
+    "type": "object",
+    "required": ["order_id", "method", "amount"],
+    "properties": {
+      "order_id": {
+        "type": "integer"
+      },
+      "method": {
+        "type": "string",
+        "enum": ["card", "paypal", "cash_on_delivery"]
+      },
+      "amount": {
+        "type": "number"
+      },
+      "status": {
+        "type": "string",
+        "enum": ["pending", "success", "failed", "refunded"]
+      },
+      "transaction_id": {
+        "type": "string",
+        "maxLength": 100
+      }
+    }
+  },
+  "updatePayment": {
+    "type": "object",
+    "properties": {
+      "method": {
+        "type": "string",
+        "enum": ["card", "paypal", "cash_on_delivery"]
+      },
+      "amount": {
+        "type": "number"
+      },
+      "status": {
+        "type": "string",
+        "enum": ["pending", "success", "failed", "refunded"]
+      },
+      "transaction_id": {
+        "type": "string",
+        "maxLength": 100
+      }
+    }
+  },
+  "getPaymentParams": {
+    "type": "object",
+    "required": ["id"],
+    "properties": {
+      "id": {
+        "type": "string",
+        "pattern": "^[0-9]+$"
+      }
+    }
+  },
+  "deletePaymentParams": {
+    "type": "object",
+    "required": ["id"],
+    "properties": {
+      "id": {
+        "type": "string",
+        "pattern": "^[0-9]+$"
+      }
+    }
+  },
+  "getPaymentsQuery": {
+    "type": "object",
+    "properties": {
+      "order_id": {
+        "type": "string",
+        "pattern": "^[0-9]+$"
+      },
+      "status": {
+        "type": "string",
+        "enum": ["pending", "success", "failed", "refunded"]
+      },
+      "method": {
+        "type": "string",
+        "enum": ["card", "paypal", "cash_on_delivery"]
+      }
+    }
+  }
+}
+
