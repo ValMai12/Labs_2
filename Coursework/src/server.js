@@ -5,6 +5,7 @@ const { productRoutes } = require("./routes/product.routes");
 const { cartRoutes } = require("./routes/cart.routes");
 const { cartItemRoutes } = require("./routes/cartitem.routes");
 const { addressRoutes } = require("./routes/address.routes");
+const { categoryRoutes } = require("./routes/category.routes");
 
 const fastify = Fastify({
   logger: true,
@@ -16,6 +17,7 @@ fastify.register(productRoutes);
 fastify.register(cartRoutes);
 fastify.register(cartItemRoutes);
 fastify.register(addressRoutes);
+fastify.register(categoryRoutes);
 
 fastify.get("/", async (request, reply) => {
   return "Maievska Valeria IM41";
