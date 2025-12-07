@@ -1,0 +1,74 @@
+{
+  "createDelivery": {
+    "type": "object",
+    "required": ["order_id"],
+    "properties": {
+      "order_id": {
+        "type": "integer"
+      },
+      "courier": {
+        "type": "string",
+        "maxLength": 50
+      },
+      "tracking_number": {
+        "type": "string",
+        "maxLength": 100
+      },
+      "status": {
+        "type": "string",
+        "enum": ["preparing", "in_transit", "delivered", "returned"]
+      }
+    }
+  },
+  "updateDelivery": {
+    "type": "object",
+    "properties": {
+      "courier": {
+        "type": "string",
+        "maxLength": 50
+      },
+      "tracking_number": {
+        "type": "string",
+        "maxLength": 100
+      },
+      "status": {
+        "type": "string",
+        "enum": ["preparing", "in_transit", "delivered", "returned"]
+      }
+    }
+  },
+  "getDeliveryParams": {
+    "type": "object",
+    "required": ["id"],
+    "properties": {
+      "id": {
+        "type": "string",
+        "pattern": "^[0-9]+$"
+      }
+    }
+  },
+  "deleteDeliveryParams": {
+    "type": "object",
+    "required": ["id"],
+    "properties": {
+      "id": {
+        "type": "string",
+        "pattern": "^[0-9]+$"
+      }
+    }
+  },
+  "getDeliveriesQuery": {
+    "type": "object",
+    "properties": {
+      "order_id": {
+        "type": "string",
+        "pattern": "^[0-9]+$"
+      },
+      "status": {
+        "type": "string",
+        "enum": ["preparing", "in_transit", "delivered", "returned"]
+      }
+    }
+  }
+}
+
