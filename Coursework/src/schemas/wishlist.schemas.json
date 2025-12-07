@@ -1,0 +1,48 @@
+{
+  "createWishlist": {
+    "type": "object",
+    "required": ["user_id", "product_id"],
+    "properties": {
+      "user_id": {
+        "type": "integer"
+      },
+      "product_id": {
+        "type": "integer"
+      }
+    }
+  },
+  "getWishlistParams": {
+    "type": "object",
+    "required": ["id"],
+    "properties": {
+      "id": {
+        "type": "string",
+        "pattern": "^[0-9]+$"
+      }
+    }
+  },
+  "deleteWishlistParams": {
+    "type": "object",
+    "required": ["id"],
+    "properties": {
+      "id": {
+        "type": "string",
+        "pattern": "^[0-9]+$"
+      }
+    }
+  },
+  "getWishlistsQuery": {
+    "type": "object",
+    "properties": {
+      "user_id": {
+        "type": "string",
+        "pattern": "^[0-9]+$"
+      },
+      "product_id": {
+        "type": "string",
+        "pattern": "^[0-9]+$"
+      }
+    }
+  }
+}
+
