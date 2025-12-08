@@ -1,0 +1,68 @@
+{
+  "createPostalRegion": {
+    "type": "object",
+    "required": ["postal_code", "city", "country"],
+    "properties": {
+      "postal_code": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 20
+      },
+      "city": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 50
+      },
+      "country": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 50
+      }
+    }
+  },
+  "updatePostalRegion": {
+    "type": "object",
+    "properties": {
+      "city": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 50
+      },
+      "country": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 50
+      }
+    }
+  },
+  "getPostalRegionParams": {
+    "type": "object",
+    "required": ["id"],
+    "properties": {
+      "id": {
+        "type": "string"
+      }
+    }
+  },
+  "deletePostalRegionParams": {
+    "type": "object",
+    "required": ["id"],
+    "properties": {
+      "id": {
+        "type": "string"
+      }
+    }
+  },
+  "getPostalRegionsQuery": {
+    "type": "object",
+    "properties": {
+      "city": {
+        "type": "string"
+      },
+      "country": {
+        "type": "string"
+      }
+    }
+  }
+}
+
