@@ -1,3 +1,4 @@
+require("dotenv/config");
 const Fastify = require("fastify");
 const { userRoutes } = require("./routes/user.routes");
 const { orderRoutes } = require("./routes/order.routes");
