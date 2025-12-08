@@ -108,6 +108,24 @@ async function orderRoutes(fastify) {
       }
     }
   );
+
+  fastify.post(
+    "/orders/with-products",
+    {
+      schema: {
+        body: orderSchemas.createOrderWithProducts,
+      },
+    },
+    async (request, reply) => {
+      try {
+        const order = await orderService.createOrderWithProducts(request.body);
+        return reply.code(201).send(order);
+      } catch (error) {
+        const statusCode = getStatusCode(error);
+        return reply.code(statusCode).send({ error: error.message });
+      }
+    }
+  );
 }
 
 module.exports = { orderRoutes };

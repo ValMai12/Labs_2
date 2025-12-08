@@ -109,6 +109,128 @@ class OrderService {
       });
     });
   }
+
+  async createOrderWithProducts(data) {
+    return await prisma.$transaction(async (tx) => {
+      const user = await tx.user.findUnique({
+        where: { user_id: data.user_id },
+      });
+      if (!user) {
+        throw new Error("User not found");
+      }
+
+      if (data.address_id) {
+        const address = await tx.address.findUnique({
+          where: { address_id: data.address_id },
+        });
+        if (!address) {
+          throw new Error("Address not found");
+        }
+      }
+
+      let discount = null;
+      if (data.applied_discount_id) {
+        discount = await tx.discountRule.findUnique({
+          where: { discount_rule_id: data.applied_discount_id },
+        });
+        if (!discount) {
+          throw new Error("Discount rule not found");
+        }
+        if (!discount.is_active) {
+          throw new Error("Discount rule is not active");
+        }
+        const now = new Date();
+        if (now < discount.valid_from || now > discount.valid_to) {
+          throw new Error("Discount rule is not valid");
+        }
+      }
+
+      if (
+        !data.products ||
+        !Array.isArray(data.products) ||
+        data.products.length === 0
+      ) {
+        throw new Error("Products array is required and must not be empty");
+      }
+
+      const productsData = [];
+      let totalAmount = 0;
+
+      for (const item of data.products) {
+        if (!item.product_id || !item.quantity) {
+          throw new Error("Each product must have product_id and quantity");
+        }
+        if (item.quantity <= 0) {
+          throw new Error("Quantity must be greater than 0");
+        }
+
+        const product = await tx.product.findUnique({
+          where: { product_id: item.product_id },
+        });
+        if (!product) {
+          throw new Error(`Product with id ${item.product_id} not found`);
+        }
+        if (product.status !== "active") {
+          throw new Error(`Product with id ${item.product_id} is not active`);
+        }
+        if (product.stock < item.quantity) {
+          throw new Error(
+            `Insufficient stock for product ${product.name}. Available: ${product.stock}, Requested: ${item.quantity}`
+          );
+        }
+
+        const itemTotal = Number(product.price) * item.quantity;
+        totalAmount += itemTotal;
+        productsData.push({ product, quantity: item.quantity });
+      }
+
+      if (discount) {
+        if (discount.type === "percent") {
+          totalAmount = totalAmount * (1 - Number(discount.value) / 100);
+        } else if (discount.type === "fixed") {
+          totalAmount = Math.max(0, totalAmount - Number(discount.value));
+        }
+      }
+
+      const cart = await tx.cart.create({
+        data: {
+          user_id: data.user_id,
+          is_active: true,
+        },
+      });
+
+      for (const item of productsData) {
+        await tx.cartitem.create({
+          data: {
+            cart_id: cart.cart_id,
+            product_id: item.product.product_id,
+            quantity: item.quantity,
+          },
+        });
+
+        await tx.product.update({
+          where: { product_id: item.product.product_id },
+          data: {
+            stock: item.product.stock - item.quantity,
+            updated_at: new Date(),
+          },
+        });
+      }
+
+      const order = await tx.order.create({
+        data: {
+          user_id: data.user_id,
+          address_id: data.address_id,
+          cart_id: cart.cart_id,
+          total_amount: totalAmount,
+          status: data.status || "pending",
+          applied_discount_id: data.applied_discount_id,
+        },
+      });
+
+      return order;
+    });
+  }
 }
 
 module.exports = { OrderService };
