@@ -1,5 +1,6 @@
 const { CartService } = require("../services/cart.service");
 const cartSchemas = require("../schemas/cart.schemas.json");
+const { getStatusCode } = require("../utils/errorHandler");
 
 async function cartRoutes(fastify) {
   const cartService = new CartService();
@@ -16,7 +17,8 @@ async function cartRoutes(fastify) {
         const cart = await cartService.createCart(request.body);
         return reply.code(201).send(cart);
       } catch (error) {
-        return reply.code(400).send({ error: error.message });
+        const statusCode = getStatusCode(error);
+        return reply.code(statusCode).send({ error: error.message });
       }
     }
   );
@@ -34,7 +36,7 @@ async function cartRoutes(fastify) {
         const cart = await cartService.getCartById(id);
         return reply.send(cart);
       } catch (error) {
-        const statusCode = error.message === "Cart not found" ? 404 : 400;
+        const statusCode = getStatusCode(error);
         return reply.code(statusCode).send({ error: error.message });
       }
     }
@@ -62,7 +64,8 @@ async function cartRoutes(fastify) {
         const carts = await cartService.getCarts(filters);
         return reply.send(carts);
       } catch (error) {
-        return reply.code(400).send({ error: error.message });
+        const statusCode = getStatusCode(error);
+        return reply.code(statusCode).send({ error: error.message });
       }
     }
   );
@@ -81,7 +84,7 @@ async function cartRoutes(fastify) {
         const cart = await cartService.updateCart(id, request.body);
         return reply.send(cart);
       } catch (error) {
-        const statusCode = error.message === "Cart not found" ? 404 : 400;
+        const statusCode = getStatusCode(error);
         return reply.code(statusCode).send({ error: error.message });
       }
     }
@@ -100,7 +103,7 @@ async function cartRoutes(fastify) {
         await cartService.deleteCart(id);
         return reply.code(204).send();
       } catch (error) {
-        const statusCode = error.message === "Cart not found" ? 404 : 400;
+        const statusCode = getStatusCode(error);
         return reply.code(statusCode).send({ error: error.message });
       }
     }

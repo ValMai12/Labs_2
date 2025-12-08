@@ -1,5 +1,6 @@
 const { CartItemService } = require("../services/cartitem.service");
 const cartItemSchemas = require("../schemas/cartitem.schemas.json");
+const { getStatusCode } = require("../utils/errorHandler");
 
 async function cartItemRoutes(fastify) {
   const cartItemService = new CartItemService();
@@ -16,7 +17,8 @@ async function cartItemRoutes(fastify) {
         const cartItem = await cartItemService.createCartItem(request.body);
         return reply.code(201).send(cartItem);
       } catch (error) {
-        return reply.code(400).send({ error: error.message });
+        const statusCode = getStatusCode(error);
+        return reply.code(statusCode).send({ error: error.message });
       }
     }
   );
@@ -34,7 +36,7 @@ async function cartItemRoutes(fastify) {
         const cartItem = await cartItemService.getCartItemById(id);
         return reply.send(cartItem);
       } catch (error) {
-        const statusCode = error.message === "Cart item not found" ? 404 : 400;
+        const statusCode = getStatusCode(error);
         return reply.code(statusCode).send({ error: error.message });
       }
     }
@@ -62,7 +64,8 @@ async function cartItemRoutes(fastify) {
         const cartItems = await cartItemService.getCartItems(filters);
         return reply.send(cartItems);
       } catch (error) {
-        return reply.code(400).send({ error: error.message });
+        const statusCode = getStatusCode(error);
+        return reply.code(statusCode).send({ error: error.message });
       }
     }
   );
@@ -81,7 +84,7 @@ async function cartItemRoutes(fastify) {
         const cartItem = await cartItemService.updateCartItem(id, request.body);
         return reply.send(cartItem);
       } catch (error) {
-        const statusCode = error.message === "Cart item not found" ? 404 : 400;
+        const statusCode = getStatusCode(error);
         return reply.code(statusCode).send({ error: error.message });
       }
     }
@@ -100,7 +103,7 @@ async function cartItemRoutes(fastify) {
         await cartItemService.deleteCartItem(id);
         return reply.code(204).send();
       } catch (error) {
-        const statusCode = error.message === "Cart item not found" ? 404 : 400;
+        const statusCode = getStatusCode(error);
         return reply.code(statusCode).send({ error: error.message });
       }
     }

@@ -1,5 +1,6 @@
 const { UserService } = require("../services/user.service");
 const userSchemas = require("../schemas/user.schemas.json");
+const { getStatusCode } = require("../utils/errorHandler");
 
 async function userRoutes(fastify) {
   const userService = new UserService();
@@ -16,7 +17,8 @@ async function userRoutes(fastify) {
         const user = await userService.createUser(request.body);
         return reply.code(201).send(user);
       } catch (error) {
-        return reply.code(400).send({ error: error.message });
+        const statusCode = getStatusCode(error);
+        return reply.code(statusCode).send({ error: error.message });
       }
     }
   );
@@ -34,7 +36,7 @@ async function userRoutes(fastify) {
         const user = await userService.getUserById(id);
         return reply.send(user);
       } catch (error) {
-        const statusCode = error.message === "User not found" ? 404 : 400;
+        const statusCode = getStatusCode(error);
         return reply.code(statusCode).send({ error: error.message });
       }
     }
@@ -62,7 +64,8 @@ async function userRoutes(fastify) {
         const users = await userService.getUsers(filters);
         return reply.send(users);
       } catch (error) {
-        return reply.code(400).send({ error: error.message });
+        const statusCode = getStatusCode(error);
+        return reply.code(statusCode).send({ error: error.message });
       }
     }
   );
@@ -81,7 +84,7 @@ async function userRoutes(fastify) {
         const user = await userService.updateUser(id, request.body);
         return reply.send(user);
       } catch (error) {
-        const statusCode = error.message === "User not found" ? 404 : 400;
+        const statusCode = getStatusCode(error);
         return reply.code(statusCode).send({ error: error.message });
       }
     }
@@ -100,7 +103,7 @@ async function userRoutes(fastify) {
         await userService.deleteUser(id);
         return reply.code(204).send();
       } catch (error) {
-        const statusCode = error.message === "User not found" ? 404 : 400;
+        const statusCode = getStatusCode(error);
         return reply.code(statusCode).send({ error: error.message });
       }
     }

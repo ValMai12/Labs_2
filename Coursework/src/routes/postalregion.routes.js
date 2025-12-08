@@ -1,5 +1,6 @@
 const { PostalRegionService } = require("../services/postalregion.service");
 const postalRegionSchemas = require("../schemas/postalregion.schemas.json");
+const { getStatusCode } = require("../utils/errorHandler");
 
 async function postalRegionRoutes(fastify) {
   const postalRegionService = new PostalRegionService();
@@ -18,7 +19,8 @@ async function postalRegionRoutes(fastify) {
         );
         return reply.code(201).send(postalRegion);
       } catch (error) {
-        return reply.code(400).send({ error: error.message });
+        const statusCode = getStatusCode(error);
+        return reply.code(statusCode).send({ error: error.message });
       }
     }
   );
@@ -37,8 +39,7 @@ async function postalRegionRoutes(fastify) {
         );
         return reply.send(postalRegion);
       } catch (error) {
-        const statusCode =
-          error.message === "Postal region not found" ? 404 : 400;
+        const statusCode = getStatusCode(error);
         return reply.code(statusCode).send({ error: error.message });
       }
     }
@@ -68,7 +69,8 @@ async function postalRegionRoutes(fastify) {
         );
         return reply.send(postalRegions);
       } catch (error) {
-        return reply.code(400).send({ error: error.message });
+        const statusCode = getStatusCode(error);
+        return reply.code(statusCode).send({ error: error.message });
       }
     }
   );
@@ -89,8 +91,7 @@ async function postalRegionRoutes(fastify) {
         );
         return reply.send(postalRegion);
       } catch (error) {
-        const statusCode =
-          error.message === "Postal region not found" ? 404 : 400;
+        const statusCode = getStatusCode(error);
         return reply.code(statusCode).send({ error: error.message });
       }
     }
@@ -108,8 +109,7 @@ async function postalRegionRoutes(fastify) {
         await postalRegionService.deletePostalRegion(request.params.id);
         return reply.code(204).send();
       } catch (error) {
-        const statusCode =
-          error.message === "Postal region not found" ? 404 : 400;
+        const statusCode = getStatusCode(error);
         return reply.code(statusCode).send({ error: error.message });
       }
     }

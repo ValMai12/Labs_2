@@ -1,5 +1,6 @@
 const { WishlistService } = require("../services/wishlist.service");
 const wishlistSchemas = require("../schemas/wishlist.schemas.json");
+const { getStatusCode } = require("../utils/errorHandler");
 
 async function wishlistRoutes(fastify) {
   const wishlistService = new WishlistService();
@@ -16,7 +17,8 @@ async function wishlistRoutes(fastify) {
         const wishlist = await wishlistService.createWishlist(request.body);
         return reply.code(201).send(wishlist);
       } catch (error) {
-        return reply.code(400).send({ error: error.message });
+        const statusCode = getStatusCode(error);
+        return reply.code(statusCode).send({ error: error.message });
       }
     }
   );
@@ -34,7 +36,7 @@ async function wishlistRoutes(fastify) {
         const wishlist = await wishlistService.getWishlistById(id);
         return reply.send(wishlist);
       } catch (error) {
-        const statusCode = error.message === "Wishlist item not found" ? 404 : 400;
+        const statusCode = getStatusCode(error);
         return reply.code(statusCode).send({ error: error.message });
       }
     }
@@ -62,7 +64,8 @@ async function wishlistRoutes(fastify) {
         const wishlists = await wishlistService.getWishlists(filters);
         return reply.send(wishlists);
       } catch (error) {
-        return reply.code(400).send({ error: error.message });
+        const statusCode = getStatusCode(error);
+        return reply.code(statusCode).send({ error: error.message });
       }
     }
   );
@@ -80,7 +83,7 @@ async function wishlistRoutes(fastify) {
         await wishlistService.deleteWishlist(id);
         return reply.code(204).send();
       } catch (error) {
-        const statusCode = error.message === "Wishlist item not found" ? 404 : 400;
+        const statusCode = getStatusCode(error);
         return reply.code(statusCode).send({ error: error.message });
       }
     }

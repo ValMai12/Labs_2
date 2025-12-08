@@ -36,6 +36,8 @@ fastify.get("/", async (request, reply) => {
   return "Maievska Valeria IM41";
 });
 
+const prisma = require("./db/prisma");
+
 const start = async () => {
   try {
     const port = process.env.PORT ? parseInt(process.env.PORT) : 3000;
@@ -48,5 +50,19 @@ const start = async () => {
     process.exit(1);
   }
 };
+
+const shutdown = async () => {
+  try {
+    await fastify.close();
+    await prisma.$disconnect();
+    process.exit(0);
+  } catch (err) {
+    fastify.log.error(err);
+    process.exit(1);
+  }
+};
+
+process.on("SIGTERM", shutdown);
+process.on("SIGINT", shutdown);
 
 start();

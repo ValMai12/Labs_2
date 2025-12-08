@@ -1,5 +1,6 @@
 const { DiscountRuleService } = require("../services/discountrule.service");
 const discountRuleSchemas = require("../schemas/discountrule.schemas.json");
+const { getStatusCode } = require("../utils/errorHandler");
 
 async function discountRuleRoutes(fastify) {
   const discountRuleService = new DiscountRuleService();
@@ -18,7 +19,8 @@ async function discountRuleRoutes(fastify) {
         );
         return reply.code(201).send(discountRule);
       } catch (error) {
-        return reply.code(400).send({ error: error.message });
+        const statusCode = getStatusCode(error);
+        return reply.code(statusCode).send({ error: error.message });
       }
     }
   );
@@ -36,8 +38,7 @@ async function discountRuleRoutes(fastify) {
         const discountRule = await discountRuleService.getDiscountRuleById(id);
         return reply.send(discountRule);
       } catch (error) {
-        const statusCode =
-          error.message === "Discount rule not found" ? 404 : 400;
+        const statusCode = getStatusCode(error);
         return reply.code(statusCode).send({ error: error.message });
       }
     }
@@ -67,7 +68,8 @@ async function discountRuleRoutes(fastify) {
         );
         return reply.send(discountRules);
       } catch (error) {
-        return reply.code(400).send({ error: error.message });
+        const statusCode = getStatusCode(error);
+        return reply.code(statusCode).send({ error: error.message });
       }
     }
   );
@@ -89,8 +91,7 @@ async function discountRuleRoutes(fastify) {
         );
         return reply.send(discountRule);
       } catch (error) {
-        const statusCode =
-          error.message === "Discount rule not found" ? 404 : 400;
+        const statusCode = getStatusCode(error);
         return reply.code(statusCode).send({ error: error.message });
       }
     }
@@ -109,8 +110,7 @@ async function discountRuleRoutes(fastify) {
         await discountRuleService.deleteDiscountRule(id);
         return reply.code(204).send();
       } catch (error) {
-        const statusCode =
-          error.message === "Discount rule not found" ? 404 : 400;
+        const statusCode = getStatusCode(error);
         return reply.code(statusCode).send({ error: error.message });
       }
     }

@@ -1,5 +1,6 @@
 const { CategoryService } = require("../services/category.service");
 const categorySchemas = require("../schemas/category.schemas.json");
+const { getStatusCode } = require("../utils/errorHandler");
 
 async function categoryRoutes(fastify) {
   const categoryService = new CategoryService();
@@ -16,7 +17,8 @@ async function categoryRoutes(fastify) {
         const category = await categoryService.createCategory(request.body);
         return reply.code(201).send(category);
       } catch (error) {
-        return reply.code(400).send({ error: error.message });
+        const statusCode = getStatusCode(error);
+        return reply.code(statusCode).send({ error: error.message });
       }
     }
   );
@@ -34,7 +36,7 @@ async function categoryRoutes(fastify) {
         const category = await categoryService.getCategoryById(id);
         return reply.send(category);
       } catch (error) {
-        const statusCode = error.message === "Category not found" ? 404 : 400;
+        const statusCode = getStatusCode(error);
         return reply.code(statusCode).send({ error: error.message });
       }
     }
@@ -58,7 +60,8 @@ async function categoryRoutes(fastify) {
         const categories = await categoryService.getCategories(filters);
         return reply.send(categories);
       } catch (error) {
-        return reply.code(400).send({ error: error.message });
+        const statusCode = getStatusCode(error);
+        return reply.code(statusCode).send({ error: error.message });
       }
     }
   );
@@ -77,7 +80,7 @@ async function categoryRoutes(fastify) {
         const category = await categoryService.updateCategory(id, request.body);
         return reply.send(category);
       } catch (error) {
-        const statusCode = error.message === "Category not found" ? 404 : 400;
+        const statusCode = getStatusCode(error);
         return reply.code(statusCode).send({ error: error.message });
       }
     }
@@ -96,7 +99,7 @@ async function categoryRoutes(fastify) {
         await categoryService.deleteCategory(id);
         return reply.code(204).send();
       } catch (error) {
-        const statusCode = error.message === "Category not found" ? 404 : 400;
+        const statusCode = getStatusCode(error);
         return reply.code(statusCode).send({ error: error.message });
       }
     }

@@ -1,5 +1,6 @@
 const { OrderService } = require("../services/order.service");
 const orderSchemas = require("../schemas/order.schemas.json");
+const { getStatusCode } = require("../utils/errorHandler");
 
 async function orderRoutes(fastify) {
   const orderService = new OrderService();
@@ -16,7 +17,8 @@ async function orderRoutes(fastify) {
         const order = await orderService.createOrder(request.body);
         return reply.code(201).send(order);
       } catch (error) {
-        return reply.code(400).send({ error: error.message });
+        const statusCode = getStatusCode(error);
+        return reply.code(statusCode).send({ error: error.message });
       }
     }
   );
@@ -34,7 +36,7 @@ async function orderRoutes(fastify) {
         const order = await orderService.getOrderById(id);
         return reply.send(order);
       } catch (error) {
-        const statusCode = error.message === "Order not found" ? 404 : 400;
+        const statusCode = getStatusCode(error);
         return reply.code(statusCode).send({ error: error.message });
       }
     }
@@ -62,7 +64,8 @@ async function orderRoutes(fastify) {
         const orders = await orderService.getOrders(filters);
         return reply.send(orders);
       } catch (error) {
-        return reply.code(400).send({ error: error.message });
+        const statusCode = getStatusCode(error);
+        return reply.code(statusCode).send({ error: error.message });
       }
     }
   );
@@ -81,7 +84,7 @@ async function orderRoutes(fastify) {
         const order = await orderService.updateOrder(id, request.body);
         return reply.send(order);
       } catch (error) {
-        const statusCode = error.message === "Order not found" ? 404 : 400;
+        const statusCode = getStatusCode(error);
         return reply.code(statusCode).send({ error: error.message });
       }
     }
@@ -100,7 +103,7 @@ async function orderRoutes(fastify) {
         await orderService.deleteOrder(id);
         return reply.code(204).send();
       } catch (error) {
-        const statusCode = error.message === "Order not found" ? 404 : 400;
+        const statusCode = getStatusCode(error);
         return reply.code(statusCode).send({ error: error.message });
       }
     }

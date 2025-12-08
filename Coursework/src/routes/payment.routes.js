@@ -1,5 +1,6 @@
 const { PaymentService } = require("../services/payment.service");
 const paymentSchemas = require("../schemas/payment.schemas.json");
+const { getStatusCode } = require("../utils/errorHandler");
 
 async function paymentRoutes(fastify) {
   const paymentService = new PaymentService();
@@ -16,7 +17,8 @@ async function paymentRoutes(fastify) {
         const payment = await paymentService.createPayment(request.body);
         return reply.code(201).send(payment);
       } catch (error) {
-        return reply.code(400).send({ error: error.message });
+        const statusCode = getStatusCode(error);
+        return reply.code(statusCode).send({ error: error.message });
       }
     }
   );
@@ -34,7 +36,7 @@ async function paymentRoutes(fastify) {
         const payment = await paymentService.getPaymentById(id);
         return reply.send(payment);
       } catch (error) {
-        const statusCode = error.message === "Payment not found" ? 404 : 400;
+        const statusCode = getStatusCode(error);
         return reply.code(statusCode).send({ error: error.message });
       }
     }
@@ -66,7 +68,8 @@ async function paymentRoutes(fastify) {
         const payments = await paymentService.getPayments(filters);
         return reply.send(payments);
       } catch (error) {
-        return reply.code(400).send({ error: error.message });
+        const statusCode = getStatusCode(error);
+        return reply.code(statusCode).send({ error: error.message });
       }
     }
   );
@@ -85,7 +88,7 @@ async function paymentRoutes(fastify) {
         const payment = await paymentService.updatePayment(id, request.body);
         return reply.send(payment);
       } catch (error) {
-        const statusCode = error.message === "Payment not found" ? 404 : 400;
+        const statusCode = getStatusCode(error);
         return reply.code(statusCode).send({ error: error.message });
       }
     }
@@ -104,7 +107,7 @@ async function paymentRoutes(fastify) {
         await paymentService.deletePayment(id);
         return reply.code(204).send();
       } catch (error) {
-        const statusCode = error.message === "Payment not found" ? 404 : 400;
+        const statusCode = getStatusCode(error);
         return reply.code(statusCode).send({ error: error.message });
       }
     }

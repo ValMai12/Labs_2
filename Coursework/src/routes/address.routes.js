@@ -1,5 +1,6 @@
 const { AddressService } = require("../services/address.service");
 const addressSchemas = require("../schemas/address.schemas.json");
+const { getStatusCode } = require("../utils/errorHandler");
 
 async function addressRoutes(fastify) {
   const addressService = new AddressService();
@@ -16,7 +17,8 @@ async function addressRoutes(fastify) {
         const address = await addressService.createAddress(request.body);
         return reply.code(201).send(address);
       } catch (error) {
-        return reply.code(400).send({ error: error.message });
+        const statusCode = getStatusCode(error);
+        return reply.code(statusCode).send({ error: error.message });
       }
     }
   );
@@ -34,7 +36,7 @@ async function addressRoutes(fastify) {
         const address = await addressService.getAddressById(id);
         return reply.send(address);
       } catch (error) {
-        const statusCode = error.message === "Address not found" ? 404 : 400;
+        const statusCode = getStatusCode(error);
         return reply.code(statusCode).send({ error: error.message });
       }
     }
@@ -62,7 +64,8 @@ async function addressRoutes(fastify) {
         const addresses = await addressService.getAddresses(filters);
         return reply.send(addresses);
       } catch (error) {
-        return reply.code(400).send({ error: error.message });
+        const statusCode = getStatusCode(error);
+        return reply.code(statusCode).send({ error: error.message });
       }
     }
   );
@@ -81,7 +84,7 @@ async function addressRoutes(fastify) {
         const address = await addressService.updateAddress(id, request.body);
         return reply.send(address);
       } catch (error) {
-        const statusCode = error.message === "Address not found" ? 404 : 400;
+        const statusCode = getStatusCode(error);
         return reply.code(statusCode).send({ error: error.message });
       }
     }
@@ -100,7 +103,7 @@ async function addressRoutes(fastify) {
         await addressService.deleteAddress(id);
         return reply.code(204).send();
       } catch (error) {
-        const statusCode = error.message === "Address not found" ? 404 : 400;
+        const statusCode = getStatusCode(error);
         return reply.code(statusCode).send({ error: error.message });
       }
     }

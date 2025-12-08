@@ -1,5 +1,6 @@
 const { DeliveryService } = require("../services/delivery.service");
 const deliverySchemas = require("../schemas/delivery.schemas.json");
+const { getStatusCode } = require("../utils/errorHandler");
 
 async function deliveryRoutes(fastify) {
   const deliveryService = new DeliveryService();
@@ -16,7 +17,8 @@ async function deliveryRoutes(fastify) {
         const delivery = await deliveryService.createDelivery(request.body);
         return reply.code(201).send(delivery);
       } catch (error) {
-        return reply.code(400).send({ error: error.message });
+        const statusCode = getStatusCode(error);
+        return reply.code(statusCode).send({ error: error.message });
       }
     }
   );
@@ -34,7 +36,7 @@ async function deliveryRoutes(fastify) {
         const delivery = await deliveryService.getDeliveryById(id);
         return reply.send(delivery);
       } catch (error) {
-        const statusCode = error.message === "Delivery not found" ? 404 : 400;
+        const statusCode = getStatusCode(error);
         return reply.code(statusCode).send({ error: error.message });
       }
     }
@@ -62,7 +64,8 @@ async function deliveryRoutes(fastify) {
         const deliveries = await deliveryService.getDeliveries(filters);
         return reply.send(deliveries);
       } catch (error) {
-        return reply.code(400).send({ error: error.message });
+        const statusCode = getStatusCode(error);
+        return reply.code(statusCode).send({ error: error.message });
       }
     }
   );
@@ -81,7 +84,7 @@ async function deliveryRoutes(fastify) {
         const delivery = await deliveryService.updateDelivery(id, request.body);
         return reply.send(delivery);
       } catch (error) {
-        const statusCode = error.message === "Delivery not found" ? 404 : 400;
+        const statusCode = getStatusCode(error);
         return reply.code(statusCode).send({ error: error.message });
       }
     }
@@ -100,7 +103,7 @@ async function deliveryRoutes(fastify) {
         await deliveryService.deleteDelivery(id);
         return reply.code(204).send();
       } catch (error) {
-        const statusCode = error.message === "Delivery not found" ? 404 : 400;
+        const statusCode = getStatusCode(error);
         return reply.code(statusCode).send({ error: error.message });
       }
     }

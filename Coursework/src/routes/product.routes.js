@@ -1,5 +1,6 @@
 const { ProductService } = require("../services/product.service");
 const productSchemas = require("../schemas/product.schemas.json");
+const { getStatusCode } = require("../utils/errorHandler");
 
 async function productRoutes(fastify) {
   const productService = new ProductService();
@@ -16,7 +17,8 @@ async function productRoutes(fastify) {
         const product = await productService.createProduct(request.body);
         return reply.code(201).send(product);
       } catch (error) {
-        return reply.code(400).send({ error: error.message });
+        const statusCode = getStatusCode(error);
+        return reply.code(statusCode).send({ error: error.message });
       }
     }
   );
@@ -34,7 +36,7 @@ async function productRoutes(fastify) {
         const product = await productService.getProductById(id);
         return reply.send(product);
       } catch (error) {
-        const statusCode = error.message === "Product not found" ? 404 : 400;
+        const statusCode = getStatusCode(error);
         return reply.code(statusCode).send({ error: error.message });
       }
     }
@@ -62,7 +64,8 @@ async function productRoutes(fastify) {
         const products = await productService.getProducts(filters);
         return reply.send(products);
       } catch (error) {
-        return reply.code(400).send({ error: error.message });
+        const statusCode = getStatusCode(error);
+        return reply.code(statusCode).send({ error: error.message });
       }
     }
   );
@@ -81,7 +84,7 @@ async function productRoutes(fastify) {
         const product = await productService.updateProduct(id, request.body);
         return reply.send(product);
       } catch (error) {
-        const statusCode = error.message === "Product not found" ? 404 : 400;
+        const statusCode = getStatusCode(error);
         return reply.code(statusCode).send({ error: error.message });
       }
     }
@@ -100,7 +103,7 @@ async function productRoutes(fastify) {
         await productService.deleteProduct(id);
         return reply.code(204).send();
       } catch (error) {
-        const statusCode = error.message === "Product not found" ? 404 : 400;
+        const statusCode = getStatusCode(error);
         return reply.code(statusCode).send({ error: error.message });
       }
     }

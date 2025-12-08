@@ -1,5 +1,6 @@
 const { ReviewService } = require("../services/review.service");
 const reviewSchemas = require("../schemas/review.schemas.json");
+const { getStatusCode } = require("../utils/errorHandler");
 
 async function reviewRoutes(fastify) {
   const reviewService = new ReviewService();
@@ -16,7 +17,8 @@ async function reviewRoutes(fastify) {
         const review = await reviewService.createReview(request.body);
         return reply.code(201).send(review);
       } catch (error) {
-        return reply.code(400).send({ error: error.message });
+        const statusCode = getStatusCode(error);
+        return reply.code(statusCode).send({ error: error.message });
       }
     }
   );
@@ -34,7 +36,7 @@ async function reviewRoutes(fastify) {
         const review = await reviewService.getReviewById(id);
         return reply.send(review);
       } catch (error) {
-        const statusCode = error.message === "Review not found" ? 404 : 400;
+        const statusCode = getStatusCode(error);
         return reply.code(statusCode).send({ error: error.message });
       }
     }
@@ -66,7 +68,8 @@ async function reviewRoutes(fastify) {
         const reviews = await reviewService.getReviews(filters);
         return reply.send(reviews);
       } catch (error) {
-        return reply.code(400).send({ error: error.message });
+        const statusCode = getStatusCode(error);
+        return reply.code(statusCode).send({ error: error.message });
       }
     }
   );
@@ -85,7 +88,7 @@ async function reviewRoutes(fastify) {
         const review = await reviewService.updateReview(id, request.body);
         return reply.send(review);
       } catch (error) {
-        const statusCode = error.message === "Review not found" ? 404 : 400;
+        const statusCode = getStatusCode(error);
         return reply.code(statusCode).send({ error: error.message });
       }
     }
@@ -104,7 +107,7 @@ async function reviewRoutes(fastify) {
         await reviewService.deleteReview(id);
         return reply.code(204).send();
       } catch (error) {
-        const statusCode = error.message === "Review not found" ? 404 : 400;
+        const statusCode = getStatusCode(error);
         return reply.code(statusCode).send({ error: error.message });
       }
     }
