@@ -3,6 +3,15 @@ const prisma = require("../db/prisma");
 class CategoryService {
   async createCategory(data) {
     return await prisma.$transaction(async (tx) => {
+      if (data.parent_id) {
+        const parentCategory = await tx.category.findUnique({
+          where: { category_id: data.parent_id },
+        });
+        if (!parentCategory) {
+          throw new Error("Parent category not found");
+        }
+      }
+
       return await tx.category.create({
         data: {
           name: data.name,
@@ -14,28 +23,24 @@ class CategoryService {
   }
 
   async getCategoryById(id) {
-    return await prisma.$transaction(async (tx) => {
-      const category = await tx.category.findUnique({
-        where: { category_id: id },
-      });
-      if (!category) {
-        throw new Error("Category not found");
-      }
-      return category;
+    const category = await prisma.category.findUnique({
+      where: { category_id: id },
     });
+    if (!category) {
+      throw new Error("Category not found");
+    }
+    return category;
   }
 
   async getCategories(filters) {
-    return await prisma.$transaction(async (tx) => {
-      const where = {};
+    const where = {};
 
-      if (filters?.parent_id) {
-        where.parent_id = parseInt(filters.parent_id);
-      }
+    if (filters?.parent_id) {
+      where.parent_id = parseInt(filters.parent_id);
+    }
 
-      return await tx.category.findMany({
-        where,
-      });
+    return await prisma.category.findMany({
+      where,
     });
   }
 
@@ -46,6 +51,15 @@ class CategoryService {
       });
       if (!existingCategory) {
         throw new Error("Category not found");
+      }
+
+      if (data.parent_id && data.parent_id !== existingCategory.parent_id) {
+        const parentCategory = await tx.category.findUnique({
+          where: { category_id: data.parent_id },
+        });
+        if (!parentCategory) {
+          throw new Error("Parent category not found");
+        }
       }
 
       return await tx.category.update({
@@ -74,4 +88,3 @@ class CategoryService {
 }
 
 module.exports = { CategoryService };
-

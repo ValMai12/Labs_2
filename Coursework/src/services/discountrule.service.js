@@ -24,33 +24,29 @@ class DiscountRuleService {
   }
 
   async getDiscountRuleById(id) {
-    return await prisma.$transaction(async (tx) => {
-      const discountRule = await tx.discountRule.findUnique({
-        where: { discount_rule_id: id },
-      });
-      if (!discountRule) {
-        throw new Error("Discount rule not found");
-      }
-      return discountRule;
+    const discountRule = await prisma.discountRule.findUnique({
+      where: { discount_rule_id: id },
     });
+    if (!discountRule) {
+      throw new Error("Discount rule not found");
+    }
+    return discountRule;
   }
 
   async getDiscountRules(filters) {
-    return await prisma.$transaction(async (tx) => {
-      const where = {};
+    const where = {};
 
-      if (filters?.is_active !== undefined) {
-        where.is_active = filters.is_active === "true";
-      }
+    if (filters?.is_active !== undefined) {
+      where.is_active = filters.is_active === "true";
+    }
 
-      if (filters?.type) {
-        where.type = filters.type;
-      }
+    if (filters?.type) {
+      where.type = filters.type;
+    }
 
-      return await tx.discountRule.findMany({
-        where,
-        orderBy: { valid_from: "desc" },
-      });
+    return await prisma.discountRule.findMany({
+      where,
+      orderBy: { valid_from: "desc" },
     });
   }
 
@@ -104,4 +100,3 @@ class DiscountRuleService {
 }
 
 module.exports = { DiscountRuleService };
-

@@ -25,33 +25,29 @@ class UserService {
   }
 
   async getUserById(id) {
-    return await prisma.$transaction(async (tx) => {
-      const user = await tx.user.findUnique({
-        where: { user_id: id },
-      });
-      if (!user) {
-        throw new Error("User not found");
-      }
-      return user;
+    const user = await prisma.user.findUnique({
+      where: { user_id: id },
     });
+    if (!user) {
+      throw new Error("User not found");
+    }
+    return user;
   }
 
   async getUsers(filters) {
-    return await prisma.$transaction(async (tx) => {
-      const where = {};
+    const where = {};
 
-      if (filters?.role) {
-        where.role = filters.role;
-      }
+    if (filters?.role) {
+      where.role = filters.role;
+    }
 
-      if (filters?.is_active !== undefined) {
-        where.is_active = filters.is_active;
-      }
+    if (filters?.is_active !== undefined) {
+      where.is_active = filters.is_active;
+    }
 
-      return await tx.user.findMany({
-        where,
-        orderBy: { created_at: "desc" },
-      });
+    return await prisma.user.findMany({
+      where,
+      orderBy: { created_at: "desc" },
     });
   }
 

@@ -3,6 +3,20 @@ const prisma = require("../db/prisma");
 class CartItemService {
   async createCartItem(data) {
     return await prisma.$transaction(async (tx) => {
+      const cart = await tx.cart.findUnique({
+        where: { cart_id: data.cart_id },
+      });
+      if (!cart) {
+        throw new Error("Cart not found");
+      }
+
+      const product = await tx.product.findUnique({
+        where: { product_id: data.product_id },
+      });
+      if (!product) {
+        throw new Error("Product not found");
+      }
+
       return await tx.cartitem.create({
         data: {
           cart_id: data.cart_id,
@@ -14,33 +28,29 @@ class CartItemService {
   }
 
   async getCartItemById(id) {
-    return await prisma.$transaction(async (tx) => {
-      const cartItem = await tx.cartitem.findUnique({
-        where: { cart_item_id: id },
-      });
-      if (!cartItem) {
-        throw new Error("Cart item not found");
-      }
-      return cartItem;
+    const cartItem = await prisma.cartitem.findUnique({
+      where: { cart_item_id: id },
     });
+    if (!cartItem) {
+      throw new Error("Cart item not found");
+    }
+    return cartItem;
   }
 
   async getCartItems(filters) {
-    return await prisma.$transaction(async (tx) => {
-      const where = {};
+    const where = {};
 
-      if (filters?.cart_id) {
-        where.cart_id = parseInt(filters.cart_id);
-      }
+    if (filters?.cart_id) {
+      where.cart_id = parseInt(filters.cart_id);
+    }
 
-      if (filters?.product_id) {
-        where.product_id = parseInt(filters.product_id);
-      }
+    if (filters?.product_id) {
+      where.product_id = parseInt(filters.product_id);
+    }
 
-      return await tx.cartitem.findMany({
-        where,
-        orderBy: { added_at: "desc" },
-      });
+    return await prisma.cartitem.findMany({
+      where,
+      orderBy: { added_at: "desc" },
     });
   }
 
@@ -79,4 +89,3 @@ class CartItemService {
 }
 
 module.exports = { CartItemService };
-

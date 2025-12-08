@@ -3,6 +3,24 @@ const prisma = require("../db/prisma");
 class ProductService {
   async createProduct(data) {
     return await prisma.$transaction(async (tx) => {
+      if (data.category_id) {
+        const category = await tx.category.findUnique({
+          where: { category_id: data.category_id },
+        });
+        if (!category) {
+          throw new Error("Category not found");
+        }
+      }
+
+      if (data.discount_rule_id) {
+        const discount = await tx.discountRule.findUnique({
+          where: { discount_rule_id: data.discount_rule_id },
+        });
+        if (!discount) {
+          throw new Error("Discount rule not found");
+        }
+      }
+
       return await tx.product.create({
         data: {
           category_id: data.category_id,
@@ -19,33 +37,29 @@ class ProductService {
   }
 
   async getProductById(id) {
-    return await prisma.$transaction(async (tx) => {
-      const product = await tx.product.findUnique({
-        where: { product_id: id },
-      });
-      if (!product) {
-        throw new Error("Product not found");
-      }
-      return product;
+    const product = await prisma.product.findUnique({
+      where: { product_id: id },
     });
+    if (!product) {
+      throw new Error("Product not found");
+    }
+    return product;
   }
 
   async getProducts(filters) {
-    return await prisma.$transaction(async (tx) => {
-      const where = {};
+    const where = {};
 
-      if (filters?.category_id) {
-        where.category_id = parseInt(filters.category_id);
-      }
+    if (filters?.category_id) {
+      where.category_id = parseInt(filters.category_id);
+    }
 
-      if (filters?.status) {
-        where.status = filters.status;
-      }
+    if (filters?.status) {
+      where.status = filters.status;
+    }
 
-      return await tx.product.findMany({
-        where,
-        orderBy: { created_at: "desc" },
-      });
+    return await prisma.product.findMany({
+      where,
+      orderBy: { created_at: "desc" },
     });
   }
 

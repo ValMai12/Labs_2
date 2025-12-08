@@ -3,6 +3,20 @@ const prisma = require("../db/prisma");
 class DeliveryService {
   async createDelivery(data) {
     return await prisma.$transaction(async (tx) => {
+      const order = await tx.order.findUnique({
+        where: { order_id: data.order_id },
+      });
+      if (!order) {
+        throw new Error("Order not found");
+      }
+
+      const existingDelivery = await tx.delivery.findUnique({
+        where: { order_id: data.order_id },
+      });
+      if (existingDelivery) {
+        throw new Error("Delivery already exists for this order");
+      }
+
       return await tx.delivery.create({
         data: {
           order_id: data.order_id,
@@ -15,33 +29,29 @@ class DeliveryService {
   }
 
   async getDeliveryById(id) {
-    return await prisma.$transaction(async (tx) => {
-      const delivery = await tx.delivery.findUnique({
-        where: { delivery_id: id },
-      });
-      if (!delivery) {
-        throw new Error("Delivery not found");
-      }
-      return delivery;
+    const delivery = await prisma.delivery.findUnique({
+      where: { delivery_id: id },
     });
+    if (!delivery) {
+      throw new Error("Delivery not found");
+    }
+    return delivery;
   }
 
   async getDeliveries(filters) {
-    return await prisma.$transaction(async (tx) => {
-      const where = {};
+    const where = {};
 
-      if (filters?.order_id) {
-        where.order_id = parseInt(filters.order_id);
-      }
+    if (filters?.order_id) {
+      where.order_id = parseInt(filters.order_id);
+    }
 
-      if (filters?.status) {
-        where.status = filters.status;
-      }
+    if (filters?.status) {
+      where.status = filters.status;
+    }
 
-      return await tx.delivery.findMany({
-        where,
-        orderBy: { updated_at: "desc" },
-      });
+    return await prisma.delivery.findMany({
+      where,
+      orderBy: { updated_at: "desc" },
     });
   }
 
@@ -81,4 +91,3 @@ class DeliveryService {
 }
 
 module.exports = { DeliveryService };
-

@@ -3,6 +3,13 @@ const prisma = require("../db/prisma");
 class PaymentService {
   async createPayment(data) {
     return await prisma.$transaction(async (tx) => {
+      const order = await tx.order.findUnique({
+        where: { order_id: data.order_id },
+      });
+      if (!order) {
+        throw new Error("Order not found");
+      }
+
       return await tx.payment.create({
         data: {
           order_id: data.order_id,
@@ -16,37 +23,33 @@ class PaymentService {
   }
 
   async getPaymentById(id) {
-    return await prisma.$transaction(async (tx) => {
-      const payment = await tx.payment.findUnique({
-        where: { payment_id: id },
-      });
-      if (!payment) {
-        throw new Error("Payment not found");
-      }
-      return payment;
+    const payment = await prisma.payment.findUnique({
+      where: { payment_id: id },
     });
+    if (!payment) {
+      throw new Error("Payment not found");
+    }
+    return payment;
   }
 
   async getPayments(filters) {
-    return await prisma.$transaction(async (tx) => {
-      const where = {};
+    const where = {};
 
-      if (filters?.order_id) {
-        where.order_id = parseInt(filters.order_id);
-      }
+    if (filters?.order_id) {
+      where.order_id = parseInt(filters.order_id);
+    }
 
-      if (filters?.status) {
-        where.status = filters.status;
-      }
+    if (filters?.status) {
+      where.status = filters.status;
+    }
 
-      if (filters?.method) {
-        where.method = filters.method;
-      }
+    if (filters?.method) {
+      where.method = filters.method;
+    }
 
-      return await tx.payment.findMany({
-        where,
-        orderBy: { created_at: "desc" },
-      });
+    return await prisma.payment.findMany({
+      where,
+      orderBy: { created_at: "desc" },
     });
   }
 
@@ -85,4 +88,3 @@ class PaymentService {
 }
 
 module.exports = { PaymentService };
-

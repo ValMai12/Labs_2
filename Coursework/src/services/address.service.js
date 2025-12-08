@@ -3,6 +3,20 @@ const prisma = require("../db/prisma");
 class AddressService {
   async createAddress(data) {
     return await prisma.$transaction(async (tx) => {
+      const user = await tx.user.findUnique({
+        where: { user_id: data.user_id },
+      });
+      if (!user) {
+        throw new Error("User not found");
+      }
+
+      const postalRegion = await tx.postalRegion.findUnique({
+        where: { postal_code: data.postal_code },
+      });
+      if (!postalRegion) {
+        throw new Error("Postal region not found");
+      }
+
       return await tx.address.create({
         data: {
           user_id: data.user_id,
@@ -15,32 +29,28 @@ class AddressService {
   }
 
   async getAddressById(id) {
-    return await prisma.$transaction(async (tx) => {
-      const address = await tx.address.findUnique({
-        where: { address_id: id },
-      });
-      if (!address) {
-        throw new Error("Address not found");
-      }
-      return address;
+    const address = await prisma.address.findUnique({
+      where: { address_id: id },
     });
+    if (!address) {
+      throw new Error("Address not found");
+    }
+    return address;
   }
 
   async getAddresses(filters) {
-    return await prisma.$transaction(async (tx) => {
-      const where = {};
+    const where = {};
 
-      if (filters?.user_id) {
-        where.user_id = parseInt(filters.user_id);
-      }
+    if (filters?.user_id) {
+      where.user_id = parseInt(filters.user_id);
+    }
 
-      if (filters?.is_default !== undefined) {
-        where.is_default = filters.is_default === "true";
-      }
+    if (filters?.is_default !== undefined) {
+      where.is_default = filters.is_default === "true";
+    }
 
-      return await tx.address.findMany({
-        where,
-      });
+    return await prisma.address.findMany({
+      where,
     });
   }
 
@@ -51,6 +61,15 @@ class AddressService {
       });
       if (!existingAddress) {
         throw new Error("Address not found");
+      }
+
+      if (data.postal_code && data.postal_code !== existingAddress.postal_code) {
+        const postalRegion = await tx.postalRegion.findUnique({
+          where: { postal_code: data.postal_code },
+        });
+        if (!postalRegion) {
+          throw new Error("Postal region not found");
+        }
       }
 
       return await tx.address.update({
@@ -79,4 +98,3 @@ class AddressService {
 }
 
 module.exports = { AddressService };
-

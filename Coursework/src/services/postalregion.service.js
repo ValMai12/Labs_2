@@ -21,32 +21,28 @@ class PostalRegionService {
   }
 
   async getPostalRegionById(id) {
-    return await prisma.$transaction(async (tx) => {
-      const postalRegion = await tx.postalRegion.findUnique({
-        where: { postal_code: id },
-      });
-      if (!postalRegion) {
-        throw new Error("Postal region not found");
-      }
-      return postalRegion;
+    const postalRegion = await prisma.postalRegion.findUnique({
+      where: { postal_code: id },
     });
+    if (!postalRegion) {
+      throw new Error("Postal region not found");
+    }
+    return postalRegion;
   }
 
   async getPostalRegions(filters) {
-    return await prisma.$transaction(async (tx) => {
-      const where = {};
+    const where = {};
 
-      if (filters?.city) {
-        where.city = filters.city;
-      }
+    if (filters?.city) {
+      where.city = filters.city;
+    }
 
-      if (filters?.country) {
-        where.country = filters.country;
-      }
+    if (filters?.country) {
+      where.country = filters.country;
+    }
 
-      return await tx.postalRegion.findMany({
-        where,
-      });
+    return await prisma.postalRegion.findMany({
+      where,
     });
   }
 
@@ -85,4 +81,3 @@ class PostalRegionService {
 }
 
 module.exports = { PostalRegionService };
-
