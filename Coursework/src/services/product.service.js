@@ -96,6 +96,64 @@ class ProductService {
       });
     });
   }
+
+  async getProductsWithCategoryDetails(filters) {
+    return await prisma.$transaction(async (tx) => {
+      const where = {};
+
+      if (filters?.category_id) {
+        where.category_id = parseInt(filters.category_id);
+      }
+
+      if (filters?.status) {
+        where.status = filters.status;
+      }
+
+      if (filters?.min_price) {
+        where.price = {
+          gte: parseFloat(filters.min_price),
+        };
+      }
+
+      if (filters?.max_price) {
+        where.price = {
+          ...where.price,
+          lte: parseFloat(filters.max_price),
+        };
+      }
+
+      if (filters?.min_stock !== undefined) {
+        where.stock = {
+          ...where.stock,
+          gte: parseInt(filters.min_stock),
+        };
+      }
+
+      const orderBy = {};
+      const sortField = filters?.sort_by || "created_at";
+      const sortOrder = filters?.sort_order === "asc" ? "asc" : "desc";
+      orderBy[sortField] = sortOrder;
+
+      const limit = filters?.limit ? parseInt(filters.limit) : undefined;
+
+      const products = await tx.product.findMany({
+        where,
+        include: {
+          category: {
+            select: {
+              category_id: true,
+              name: true,
+              description: true,
+            },
+          },
+        },
+        orderBy,
+        take: limit,
+      });
+
+      return products;
+    });
+  }
 }
 
 module.exports = { ProductService };

@@ -337,6 +337,58 @@ class OrderService {
       return updatedOrder;
     });
   }
+
+  async getOrdersWithUserDetails(filters) {
+    return await prisma.$transaction(async (tx) => {
+      const where = {};
+
+      if (filters?.user_id) {
+        where.user_id = parseInt(filters.user_id);
+      }
+
+      if (filters?.status) {
+        where.status = filters.status;
+      }
+
+      if (filters?.min_amount) {
+        where.total_amount = {
+          gte: parseFloat(filters.min_amount),
+        };
+      }
+
+      if (filters?.max_amount) {
+        where.total_amount = {
+          ...where.total_amount,
+          lte: parseFloat(filters.max_amount),
+        };
+      }
+
+      const orderBy = {};
+      const sortField = filters?.sort_by || "created_at";
+      const sortOrder = filters?.sort_order === "asc" ? "asc" : "desc";
+      orderBy[sortField] = sortOrder;
+
+      const limit = filters?.limit ? parseInt(filters.limit) : undefined;
+
+      const orders = await tx.order.findMany({
+        where,
+        include: {
+          User: {
+            select: {
+              user_id: true,
+              first_name: true,
+              last_name: true,
+              email: true,
+            },
+          },
+        },
+        orderBy,
+        take: limit,
+      });
+
+      return orders;
+    });
+  }
 }
 
 module.exports = { OrderService };

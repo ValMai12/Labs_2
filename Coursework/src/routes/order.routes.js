@@ -150,6 +150,26 @@ async function orderRoutes(fastify) {
       }
     }
   );
+
+  fastify.get(
+    "/orders/with-user",
+    {
+      schema: {
+        querystring: orderSchemas.getOrdersWithUserQuery,
+      },
+    },
+    async (request, reply) => {
+      try {
+        const result = await orderService.getOrdersWithUserDetails(
+          request.query
+        );
+        return reply.send(result);
+      } catch (error) {
+        const statusCode = getStatusCode(error);
+        return reply.code(statusCode).send({ error: error.message });
+      }
+    }
+  );
 }
 
 module.exports = { orderRoutes };

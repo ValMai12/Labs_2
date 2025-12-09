@@ -108,6 +108,26 @@ async function productRoutes(fastify) {
       }
     }
   );
+
+  fastify.get(
+    "/products/with-category",
+    {
+      schema: {
+        querystring: productSchemas.getProductsWithCategoryQuery,
+      },
+    },
+    async (request, reply) => {
+      try {
+        const result = await productService.getProductsWithCategoryDetails(
+          request.query
+        );
+        return reply.send(result);
+      } catch (error) {
+        const statusCode = getStatusCode(error);
+        return reply.code(statusCode).send({ error: error.message });
+      }
+    }
+  );
 }
 
 module.exports = { productRoutes };
