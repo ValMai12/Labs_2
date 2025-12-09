@@ -128,6 +128,26 @@ async function productRoutes(fastify) {
       }
     }
   );
+
+  fastify.get(
+    "/products/most-successful",
+    {
+      schema: {
+        querystring: productSchemas.getMostSuccessfulProductsQuery,
+      },
+    },
+    async (request, reply) => {
+      try {
+        const result = await productService.getMostSuccessfulProducts(
+          request.query
+        );
+        return reply.send(result);
+      } catch (error) {
+        const statusCode = getStatusCode(error);
+        return reply.code(statusCode).send({ error: error.message });
+      }
+    }
+  );
 }
 
 module.exports = { productRoutes };

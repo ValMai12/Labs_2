@@ -154,6 +154,63 @@ class ProductService {
       return products;
     });
   }
+
+  async getMostSuccessfulProducts(filters) {
+    return await prisma.$transaction(async (tx) => {
+      const minRevenue = filters?.min_revenue
+        ? parseFloat(filters.min_revenue)
+        : 0;
+      const limit = filters?.limit ? parseInt(filters.limit) : undefined;
+
+      const query = `
+        WITH product_stats AS (
+          SELECT 
+            p.product_id,
+            p.name,
+            p.price,
+            cat.name as category_name,
+            COUNT(DISTINCT o.order_id) as order_count,
+            SUM(ci.quantity) as total_quantity_sold,
+            SUM(ci.quantity * CAST(p.price AS DECIMAL)) as total_revenue,
+            AVG(ci.quantity * CAST(p.price AS DECIMAL)) as avg_order_value
+          FROM product p
+          JOIN category cat ON p.category_id = cat.category_id
+          JOIN cartitem ci ON p.product_id = ci.product_id
+          JOIN cart c ON ci.cart_id = c.cart_id
+          JOIN "Order" o ON c.cart_id = o.cart_id
+          WHERE o.status != 'cancelled'
+            ${filters?.status ? `AND p.status = '${filters.status}'` : ""}
+            ${
+              filters?.category_id
+                ? `AND p.category_id = ${parseInt(filters.category_id)}`
+                : ""
+            }
+          GROUP BY p.product_id, p.name, p.price, cat.name
+          HAVING SUM(ci.quantity * CAST(p.price AS DECIMAL)) >= ${minRevenue}
+        )
+        SELECT 
+          *,
+          ROW_NUMBER() OVER (ORDER BY total_revenue DESC) as rank
+        FROM product_stats
+        ORDER BY total_revenue DESC
+        ${limit ? `LIMIT ${limit}` : ""}
+      `;
+
+      const results = await tx.$queryRawUnsafe(query);
+
+      return results.map((row) => ({
+        product_id: Number(row.product_id),
+        name: row.name,
+        price: Number(row.price),
+        category_name: row.category_name,
+        order_count: Number(row.order_count),
+        total_quantity_sold: Number(row.total_quantity_sold),
+        total_revenue: Number(row.total_revenue),
+        avg_order_value: Number(row.avg_order_value),
+        rank: Number(row.rank),
+      }));
+    });
+  }
 }
 
 module.exports = { ProductService };
