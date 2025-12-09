@@ -231,6 +231,112 @@ class OrderService {
       return order;
     });
   }
+
+  async updateOrderStatusWithReconciliation(id, newStatus, expectedStatus) {
+    return await prisma.$transaction(async (tx) => {
+      await tx.$queryRaw`
+        SELECT * FROM "Order" 
+        WHERE order_id = ${id} 
+        FOR UPDATE
+      `;
+
+      const currentOrder = await tx.order.findUnique({
+        where: { order_id: id },
+        include: {
+          cart: { include: { cartitem: { include: { product: true } } } },
+        },
+      });
+
+      if (!currentOrder) {
+        throw new Error("Order not found");
+      }
+
+      if (expectedStatus && currentOrder.status !== expectedStatus) {
+        throw new Error(
+          `Order status mismatch. Expected: ${expectedStatus}, Current: ${currentOrder.status}`
+        );
+      }
+
+      const validTransitions = {
+        pending: ["paid", "cancelled"],
+        paid: ["shipped", "cancelled"],
+        shipped: ["delivered", "cancelled"],
+        delivered: [],
+        cancelled: [],
+      };
+
+      if (!validTransitions[currentOrder.status]?.includes(newStatus)) {
+        throw new Error(
+          `Invalid status transition from ${currentOrder.status} to ${newStatus}`
+        );
+      }
+
+      const wasInventoryDeducted =
+        currentOrder.status !== "cancelled" && currentOrder.cart_id;
+      const willBeInventoryDeducted =
+        newStatus !== "cancelled" && currentOrder.cart_id;
+      const needsRestore = wasInventoryDeducted && newStatus === "cancelled";
+      const needsDeduct = !wasInventoryDeducted && willBeInventoryDeducted;
+
+      if (needsRestore || needsDeduct) {
+        if (
+          !currentOrder.cart ||
+          !currentOrder.cart.cartitem ||
+          currentOrder.cart.cartitem.length === 0
+        ) {
+          throw new Error("Cart items not found for order");
+        }
+
+        for (const cartItem of currentOrder.cart.cartitem) {
+          const product = await tx.product.findUnique({
+            where: { product_id: cartItem.product_id },
+          });
+
+          if (!product) {
+            throw new Error(`Product with id ${cartItem.product_id} not found`);
+          }
+
+          if (needsRestore) {
+            await tx.product.update({
+              where: { product_id: cartItem.product_id },
+              data: {
+                stock: product.stock + cartItem.quantity,
+                updated_at: new Date(),
+              },
+            });
+          } else if (needsDeduct) {
+            if (product.stock < cartItem.quantity) {
+              throw new Error(
+                `Insufficient stock for product ${product.name}. Available: ${product.stock}, Required: ${cartItem.quantity}`
+              );
+            }
+            await tx.product.update({
+              where: { product_id: cartItem.product_id },
+              data: {
+                stock: product.stock - cartItem.quantity,
+                updated_at: new Date(),
+              },
+            });
+          }
+        }
+      }
+
+      const updateData = { status: newStatus };
+
+      if (newStatus === "shipped") {
+        updateData.shipped_at = new Date();
+      } else if (newStatus === "delivered") {
+        updateData.delivered_at = new Date();
+      }
+
+      const updatedOrder = await tx.order.update({
+        where: { order_id: id },
+        data: updateData,
+      });
+
+      return updatedOrder;
+    });
+  }
 }
 
 module.exports = { OrderService };

@@ -113,6 +113,20 @@
         }
       }
     }
+  },
+  "updateOrderStatus": {
+    "type": "object",
+    "required": ["status"],
+    "properties": {
+      "status": {
+        "type": "string",
+        "enum": ["pending", "paid", "shipped", "delivered", "cancelled"]
+      },
+      "expected_status": {
+        "type": "string",
+        "enum": ["pending", "paid", "shipped", "delivered", "cancelled"]
+      }
+    }
   }
 }
 

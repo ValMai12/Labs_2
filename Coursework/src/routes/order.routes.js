@@ -126,6 +126,30 @@ async function orderRoutes(fastify) {
       }
     }
   );
+
+  fastify.patch(
+    "/orders/:id/status",
+    {
+      schema: {
+        params: orderSchemas.getOrderParams,
+        body: orderSchemas.updateOrderStatus,
+      },
+    },
+    async (request, reply) => {
+      try {
+        const id = parseInt(request.params.id);
+        const order = await orderService.updateOrderStatusWithReconciliation(
+          id,
+          request.body.status,
+          request.body.expected_status
+        );
+        return reply.send(order);
+      } catch (error) {
+        const statusCode = getStatusCode(error);
+        return reply.code(statusCode).send({ error: error.message });
+      }
+    }
+  );
 }
 
 module.exports = { orderRoutes };
